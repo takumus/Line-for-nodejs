@@ -16,13 +16,15 @@ line.on('data', function (e) {
 });
 // WebhookEvent[]を切り出してイベントを数回呼ばれるように。
 line.on('event', function (e) {
+    console.log(e);
 });
 // メッセージが来た時。
 line.on('message', function (message, replyToken, event) {
-    if (!working[event.source.userId])
-        working[event.source.userId] = 0;
-    if (working[event.source.userId] > 2) {
-        line.push(event.source.userId, [
+    var id = event.source.groupId || event.source.userId;
+    if (!working[id])
+        working[id] = 0;
+    if (working[id] > 2) {
+        line.push(id, [
             {
                 type: 'text',
                 text: 'ちょっと待てw'
@@ -33,9 +35,9 @@ line.on('message', function (message, replyToken, event) {
     line.getProfile(event.source.userId).then(function (profile) {
         console.log(profile.displayName + ' -> ' + message.text);
     })["catch"](function (e) { });
-    working[event.source.userId]++;
+    working[id]++;
     getImageFromPhotozo(message.text).then(function (fileName) {
-        line.push(event.source.userId, [
+        line.push(id, [
             {
                 type: 'text',
                 text: '画像を見つけたよ!'
@@ -48,15 +50,15 @@ line.on('message', function (message, replyToken, event) {
         ]).then(function (r) {
             // fs.unlink(Config.saveDir + fileName);
         });
-        working[event.source.userId]--;
+        working[id]--;
     })["catch"](function (message) {
-        line.push(event.source.userId, [
+        line.push(id, [
             {
                 type: 'text',
                 text: '画像が見つからないぞっ'
             }
         ]);
-        working[event.source.userId]--;
+        working[id]--;
     });
 });
 function getImageFromPhotozo(keyword) {

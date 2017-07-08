@@ -44,6 +44,7 @@ export interface LineEvent {
     source: {
         type: string;
         userId: string;
+        groupId: string;
     };
     message: LineMessage;
 }
