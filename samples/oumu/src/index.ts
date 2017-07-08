@@ -19,6 +19,6 @@ line.on('event', (e: LineEvent) => {
 // メッセージが来た時。
 line.on('message', (message: LineMessage, replyToken: string) => {
     // 語尾にfrom nodejsを追加しておうむ返し。
-    message.text += 'from nodejs';
+    message.text += '\nfrom nodejs';
     line.reply(replyToken, [message]);
 });
