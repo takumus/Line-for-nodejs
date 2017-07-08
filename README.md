@@ -33,22 +33,22 @@ line.on('message', (message, replyToken) => {
 とても簡単です！  
 ## 今のところメソッドは３つくらい
 
-###push
+### push
 １人に対してメッセージを送ります。  
 ```js
 line.push(送り先, [メッセージオブジェクト,...]);
 ```
-###multicast
+### multicast
 複数人に対してメッセージを送ります。  
 ```js
 line.multicast([送り先,...], [メッセージオブジェクト,...]);
 ```
-###reply
+### reply
 リプライトークンを使ってリプライを送ります。  
 ```js
 line.reply(リプライトークン, [メッセージオブジェクト,...]);
 ```
-###send
+### send
 データを送れます。  
 ```js
 line.send(APIのpath, 送るデータ)
