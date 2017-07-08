@@ -1,6 +1,6 @@
 'use strict';
 const Config = require('./config');
-const Line = require('./line/').Line;
+const Line = require('../../libs/').Line;
 
 const line = new Line(
     Config.channelSecret,//シークレット
@@ -19,6 +19,6 @@ line.on('event', (e) => {
 //メッセージが来た時。
 line.on('message', (message, replyToken) => {
     //語尾にfrom nodejsを追加しておうむ返し。
-    message.text += "\nfrom nodejs.";
+    message.text += 'from nodejs';
     line.reply(replyToken, [message]);
 })

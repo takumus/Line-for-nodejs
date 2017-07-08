@@ -1,11 +1,20 @@
 {
-  "name": "sample",
+  "name": "linejs",
   "version": "1.0.0",
   "description": "",
-  "main": "sample.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "_clean": "rimraf ./libs",
+    "_build": "tsc ./src/index.ts --outDir ./libs",
+    "start": "echo cleaning... && npm run _clean && echo complete && echo building... && npm run _build && echo complete!"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/es6-promise": "0.0.32",
+    "@types/node": "^7.0.31",
+    "es6-promise": "^4.1.1",
+    "typescript": "^2.3.4"
+  },
+  "dependencies": {}
 }
