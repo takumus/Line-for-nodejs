@@ -1,14 +1,11 @@
 'use strict';
 const Config = require('./config');
 const Line = require('./line').Line;
-const fs = require('fs');
 
 const line = new Line(
     Config.channelSecret,//シークレット
     Config.channelAccessToken,//アクセストークン
-    Config.httpsPort,//自分のwebhockのhttpsサーバーのポート
-    fs.readFileSync(Config.sslKeyPath),//httpsサーバーのkeyファイルのパス
-    fs.readFileSync(Config.sslCertPath)//httpsサーバーのcertファイルのパス
+    Config.serverPort//自分のwebhockのhttpsサーバーのポート
 );
 
 //なんらかのデータがLINEから来た時

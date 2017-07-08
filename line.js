@@ -5,25 +5,21 @@ const api = {
     reply_path: '/v2/bot/message/reply'
 }
 
+const http = require('http');
 const https = require('https');
 const crypto = require('crypto');
 const EventEmitter = require('events').EventEmitter;
 
 class Line extends EventEmitter{
-    constructor(channelSecret, channelAccessToken, httpsPort, sslKey, sslCert) {
+    constructor(channelSecret, channelAccessToken, serverPort) {
         super();
         this.channelSecret = channelSecret;
         this.channelAccessToken = channelAccessToken;
-        this.httpsPort = httpsPort;
-        this.sslKey = sslKey;
-        this.sslCert = sslCert;
+        this.serverPort = serverPort;
         this._init();
     }
     _init() {
-        https.createServer({
-            key: this.sslKey,
-            cert: this.sslCert
-        }, (req, res) => {    
+        http.createServer((req, res) => {    
             if(req.method !== 'POST'){
                 res.writeHead(403, {'Content-Type': 'text/plain'});
                 res.end();
@@ -40,7 +36,7 @@ class Line extends EventEmitter{
                 res.end();
             });
 
-        }).listen(this.httpsPort);
+        }).listen(this.serverPort);
     }
     _onData(data) {
         this.emit('data', data);

@@ -12,14 +12,11 @@
 
 ```js
 const Line = require('./line').Line;
-const fs = require('fs');
 
 const line = new Line(
     "XXXXXX",                      //シークレット
     "XXXXXX",                      //アクセストークン
-    3000,                          //自分のwebhockのhttpsサーバーのポート
-    fs.readFileSync("/hoge/hoge"), //httpsサーバーのkeyファイルのパス
-    fs.readFileSync("/hoge/hoga")  //httpsサーバーのcertファイルのパス
+    3000                           //自分のwebhockのサーバーのポート
 );
 
 //メッセージが来た時。
