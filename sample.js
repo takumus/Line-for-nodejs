@@ -1,6 +1,6 @@
 'use strict';
 const Config = require('./config');
-const Line = require('./line').Line;
+const Line = require('./line/').Line;
 
 const line = new Line(
     Config.channelSecret,//シークレット
