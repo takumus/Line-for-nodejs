@@ -1,6 +1,7 @@
 # Line-for-nodejs
 今のところ自分用。  
-ラインBotを簡単に使えるLine.jsです。  
+ラインBotを簡単に使えるLine.jsです。  
+参考：<http://qiita.com/n0bisuke/items/56d7ace2193fbc106639>  
 
 ## 機能
 ・X-Line-Signatureでバリデートしてくれます。（うれしい）  
