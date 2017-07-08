@@ -18,9 +18,9 @@ export declare class Line extends EventEmitter {
     private onMessage(message, replyToken, event);
     send(path: string, data: any): Promise<{}>;
     get(path: string): Promise<{}>;
-    push(to: string, messages: LineMessage[]): Promise<{}>;
-    multicast(to: string, messages: LineMessage[]): Promise<{}>;
-    reply(replyToken: string, messages: LineMessage[]): Promise<{}>;
+    push(to: string, messages: LineSendMessage[]): Promise<{}>;
+    multicast(to: string, messages: LineSendMessage[]): Promise<{}>;
+    reply(replyToken: string, messages: LineSendMessage[]): Promise<{}>;
     getProfile(userId: string): Promise<{}>;
 }
 export interface LineData {
@@ -30,6 +30,12 @@ export interface LineMessage {
     id: string;
     type: string;
     text: string;
+}
+export interface LineSendMessage {
+    type: string;
+    text?: string;
+    originalContentUrl?: string;
+    previewImageUrl?: string;
 }
 export interface LineEvent {
     replyToken: string;

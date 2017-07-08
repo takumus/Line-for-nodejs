@@ -111,19 +111,19 @@ export class Line extends EventEmitter {
             req.end();
         });
     }
-    public push(to: string, messages: LineMessage[]) {
+    public push(to: string, messages: LineSendMessage[]) {
         return this.send(API.push_path, {
             to: to,
             'messages': messages
         });
     }
-    public multicast(to: string, messages: LineMessage[]) {
+    public multicast(to: string, messages: LineSendMessage[]) {
         return this.send(API.multicast_path, {
             to: to,
             'messages': messages
         });
     }
-    public reply(replyToken: string, messages: LineMessage[]) {
+    public reply(replyToken: string, messages: LineSendMessage[]) {
         return this.send(API.reply_path, {
             replyToken: replyToken,
             'messages': messages
@@ -140,6 +140,12 @@ export interface LineMessage {
     id: string;
     type: string;
     text: string;
+}
+export interface LineSendMessage {
+    type: string;
+    text?: string;
+    originalContentUrl?: string;
+    previewImageUrl?: string;
 }
 export interface LineEvent {
     replyToken: string;
