@@ -28,7 +28,6 @@ line.on('message', (message, replyToken) => {
     message.text += "\nfrom nodejs.";
     line.reply(replyToken, [message]);
 });
-
 ```
 とても簡単です！  
 ## 今のところメソッドは３つくらい
@@ -58,19 +57,34 @@ line.send(APIのpath, 送るデータ)
 
 ## 今のところイベントは３つくらい
 
+解説が下手なのでソースを見てください！読めると思います。  
+
 ### dataイベント
-何かをラインから受け取ったらまず一番目に呼ばれます。
-↓ページの右側のjsonがオブジェクトとして渡って来ます。
-<https://devdocs.line.me/ja/#webhooks>
+何かをラインから受け取ったらまず一番目に呼ばれます。  
+↓ページの右側のjsonがオブジェクトとして渡って来ます。  
+<https://devdocs.line.me/ja/#webhooks>  
+例えば上のサンプルをdataイベントを使って書くとこうなります。  
+```js
+line.on('data', (d) => {
+    if (data.events) {
+        data.events.forEach((event) => {
+            if(e.type === 'message') {
+                //語尾に"\nfrom nodejs"を追加しておうむ返し。
+                e.message.text += "\nfrom nodejs.";
+                line.reply(e.replyToken, [e.message]);
+            }
+        });
+    }
+});
+```
 
 ### eventイベント
-２番目以降に呼ばれます。
+２番目以降に呼ばれます。  
 dataイベントのdata.eventsをforEachしてeventごとに呼んでいます。 
 データ構造は↓を参考に。  
-<https://devdocs.line.me/ja/#webhook-event-object>    
+<https://devdocs.line.me/ja/#webhook-event-object>  
 例えば上のサンプルをeventイベントを使って書くとこうなります。  
 ```js
-//イベントが来た（一度に複数のイベントが来た時は複数回emitします）
 line.on('event', (e) => {
     if(e.type === 'message') {
         //語尾に"\nfrom nodejs"を追加しておうむ返し。
@@ -83,4 +97,12 @@ line.on('event', (e) => {
 ### messageイベント
 
 メッセージが来たら呼ばれます。  
-使いやすいかなと思い、メッセージ、リプライトークン、データ本体を渡しています。
+使いやすいかなと思い、メッセージ、リプライトークン、データ本体を渡しています。  
+サンプルでも使っています。  
+```js
+line.on('message', (message, replyToken) => {
+    //語尾に"\nfrom nodejs"を追加しておうむ返し。
+    message.text += "\nfrom nodejs.";
+    line.reply(replyToken, [message]);
+});
+```
