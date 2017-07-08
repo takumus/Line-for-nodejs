@@ -66,8 +66,8 @@ line.send(APIのpath, 送るデータ)
 例えば上のサンプルをdataイベントを使って書くとこうなります。  
 ```js
 line.on('data', (d) => {
-    if (data.events) {
-        data.events.forEach((event) => {
+    if (d.events) {
+        d.events.forEach((event) => {
             if(e.type === 'message') {
                 //語尾に"\nfrom nodejs"を追加しておうむ返し。
                 e.message.text += "\nfrom nodejs.";
