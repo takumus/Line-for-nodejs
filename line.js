@@ -24,9 +24,9 @@ class Line extends EventEmitter{
             key: this.sslKey,
             cert: this.sslCert
         }, (req, res) => {    
-            if(req.url !== '/' || req.method !== 'POST'){
+            if(req.method !== 'POST'){
                 res.writeHead(403, {'Content-Type': 'text/plain'});
-                res.end('403');
+                res.end();
             }
             let body = '';
             req.on('data', (chunk) => body += chunk);        
@@ -37,7 +37,7 @@ class Line extends EventEmitter{
                 if (signatureA !== signatureB) return;
                 this._onData(JSON.parse(body));
                 res.writeHead(200, {'Content-Type': 'text/plain'});
-                res.end('su');
+                res.end();
             });
 
         }).listen(this.httpsPort);
