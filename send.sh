@@ -1,1 +1,0 @@
-rsync -avr --exclude='.git' --exclude='node_modules' ./ takumus@takumus.com:/home/takumus/lineTest/

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "_clean": "rimraf ./libs",
-    "_build": "tsc ./src/index.ts --outDir ./libs",
+    "_build": "tsc ./src/index.ts -d --outDir ./libs",
     "start": "echo cleaning... && npm run _clean && echo complete && echo building... && npm run _build && echo complete!"
   },
   "author": "",
