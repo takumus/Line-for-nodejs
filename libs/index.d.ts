@@ -5,6 +5,7 @@ export declare const API: {
     push_path: string;
     multicast_path: string;
     reply_path: string;
+    profile_path: string;
 };
 export declare class Line extends EventEmitter {
     private channelSecret;
@@ -20,6 +21,7 @@ export declare class Line extends EventEmitter {
     push(to: string, messages: LineMessage[]): Promise<{}>;
     multicast(to: string, messages: LineMessage[]): Promise<{}>;
     reply(replyToken: string, messages: LineMessage[]): Promise<{}>;
+    getProfile(userId: string): Promise<{}>;
 }
 export interface LineData {
     events: LineEvent[];
@@ -38,4 +40,10 @@ export interface LineEvent {
         userId: string;
     };
     message: LineMessage;
+}
+export interface LineProfile {
+    displayName: string;
+    userId: string;
+    pictureUrl: string;
+    statusMessage: string;
 }

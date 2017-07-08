@@ -1,5 +1,5 @@
 module.exports = {
     channelSecret:      'XXXXXXXXXXXXX',
     channelAccessToken: 'XXXXXXXXXXXXX',
-    httpsPort:          3000
+    serverPort:          3000
 }

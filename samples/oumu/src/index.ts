@@ -1,6 +1,6 @@
 'use strict';
-const Config = require('./config');
-import { Line, LineData, LineEvent, LineMessage } from '../../../libs/';
+const Config = require('../config');
+import { Line, LineData, LineEvent, LineMessage, LineProfile } from '../../../libs/';
 
 const line = new Line(
     Config.channelSecret, // シークレット
@@ -17,8 +17,11 @@ line.on('event', (e: LineEvent) => {
 });
 
 // メッセージが来た時。
-line.on('message', (message: LineMessage, replyToken: string) => {
-    // 語尾にfrom nodejsを追加しておうむ返し。
-    message.text += '\nfrom nodejs';
-    line.reply(replyToken, [message]);
+line.on('message', (message: LineMessage, replyToken: string, event: LineEvent) => {
+    console.log(event.source.userId);
+    line.getProfile(event.source.userId).then((profile: LineProfile) => {
+        console.log(profile);
+        message.text += '\nby ' + profile.displayName;
+        line.reply(replyToken, [message]);
+    }).catch((e) => console.log(e));
 });

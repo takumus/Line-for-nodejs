@@ -7,7 +7,8 @@ export const API = {
     host: 'api.line.me',
     push_path: '/v2/bot/message/push',
     multicast_path: '/v2/bot/message/multicast',
-    reply_path: '/v2/bot/message/reply'
+    reply_path: '/v2/bot/message/reply',
+    profile_path: '/v2/bot/profile'
 };
 
 export class Line extends EventEmitter {
@@ -58,7 +59,6 @@ export class Line extends EventEmitter {
     private onMessage(message: LineMessage, replyToken: string, event: LineEvent) {
         this.emit('message', message, replyToken, event);
     }
-
     public send(path: string, data: any) {
         const dataStr = JSON.stringify(data);
         return new Promise((resolve, reject) => {
@@ -87,7 +87,7 @@ export class Line extends EventEmitter {
         return new Promise<{}>((resolve, reject) => {
             const req = https.request({
                 host: API.host,
-                port: 80,
+                port: 443,
                 path: path,
                 method: 'GET',
                 headers: {
@@ -97,7 +97,15 @@ export class Line extends EventEmitter {
                 let body = '';
                 res.setEncoding('utf8');
                 res.on('data', (chunk) => body += chunk);
-                res.on('end', () => resolve(body));
+                res.on('end', () => {
+                    try {
+                        const object = JSON.parse(body);
+                        resolve(object);
+                        return;
+                    }catch (e) {
+                        resolve({});
+                    }
+                });
             });
             req.on('error', (e) => reject(e));
             req.end();
@@ -121,6 +129,9 @@ export class Line extends EventEmitter {
             'messages': messages
         });
     }
+    public getProfile(userId: string) {
+        return this.get(API.profile_path + '/' + userId);
+    }
 }
 export interface LineData {
     events: LineEvent[];
@@ -139,4 +150,10 @@ export interface LineEvent {
         userId: string;
     };
     message: LineMessage;
+}
+export interface LineProfile {
+    displayName: string;
+    userId: string;
+    pictureUrl: string;
+    statusMessage: string;
 }

@@ -18,7 +18,8 @@ exports.API = {
     host: 'api.line.me',
     push_path: '/v2/bot/message/push',
     multicast_path: '/v2/bot/message/multicast',
-    reply_path: '/v2/bot/message/reply'
+    reply_path: '/v2/bot/message/reply',
+    profile_path: '/v2/bot/profile'
 };
 var Line = (function (_super) {
     __extends(Line, _super);
@@ -100,7 +101,7 @@ var Line = (function (_super) {
         return new Promise(function (resolve, reject) {
             var req = https.request({
                 host: exports.API.host,
-                port: 80,
+                port: 443,
                 path: path,
                 method: 'GET',
                 headers: {
@@ -110,7 +111,16 @@ var Line = (function (_super) {
                 var body = '';
                 res.setEncoding('utf8');
                 res.on('data', function (chunk) { return body += chunk; });
-                res.on('end', function () { return resolve(body); });
+                res.on('end', function () {
+                    try {
+                        var object = JSON.parse(body);
+                        resolve(object);
+                        return;
+                    }
+                    catch (e) {
+                        resolve({});
+                    }
+                });
             });
             req.on('error', function (e) { return reject(e); });
             req.end();
@@ -133,6 +143,9 @@ var Line = (function (_super) {
             replyToken: replyToken,
             'messages': messages
         });
+    };
+    Line.prototype.getProfile = function (userId) {
+        return this.get(exports.API.profile_path + '/' + userId);
     };
     return Line;
 }(events_1.EventEmitter));
