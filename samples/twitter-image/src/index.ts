@@ -29,8 +29,8 @@ line.on('message', (message: LINE.Message, replyToken: string, event: LINE.Event
     const countStr = query[1];
     let count: number = 1;
     if (countStr) {
-        count = Number(countStr.split('枚')[0]);
-        if (isNaN(count)) count = 1;
+        count = convertToNumber(countStr.split('枚')[0]);
+        if (count < 0) count = 1;
     }
     if (!validate(keyword)) {
         line.push(id, [LINE.create.TextMessage('記号は使えないんだよ？w')]);
@@ -70,4 +70,20 @@ const doNotUses = ['"', "'", '/', '\\', '<', '>', '`', '?'];
 function validate(keyword: string): boolean {
     for (let i = 0; i < doNotUses.length; i ++) if (keyword.indexOf(doNotUses[i]) >= 0) return false;
     return true;
+}
+
+const emNums = ['０', '１', '２', '３', '４', '５', '６', '７', '８', '９'];
+function convertToNumber(numStr: string) {
+    let resultStr = '';
+    numStr.split('').forEach((c) => {
+        const n = emNums.indexOf(c);
+        if (n > -1) {
+            resultStr += n.toString();
+        }else {
+            resultStr += c.toString();
+        }
+    });
+    const num = Number(resultStr);
+    if (isNaN(num)) return -1;
+    return num;
 }
