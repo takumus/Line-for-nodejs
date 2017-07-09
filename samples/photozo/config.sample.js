@@ -1,7 +1,11 @@
 module.exports = {
-    channelSecret:      'XXXXXXXXXXXXX',
-    channelAccessToken: 'XXXXXXXXXXXXX',
-    serverPort:          3000,
-    saveDir:            '/XX/XX',
-    url:                'https://XXXX/'
+    line: {
+        channelSecret:      'XXXXXX',
+        channelAccessToken: 'XXXXXX',
+        serverPort:          3000
+    },
+    twitter: {
+        consumerKey:        'XXXXXX',
+        consumerKeySecret:  'XXXXXX'
+    }
 }
