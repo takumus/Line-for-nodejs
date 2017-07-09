@@ -19,6 +19,11 @@ export declare const create: {
         originalContentUrl: string;
         previewImageUrl: string;
     };
+    VideoMessage: (videoURL: string, thumbnailURL: string) => {
+        type: string;
+        originalContentUrl: string;
+        previewImageUrl: string;
+    };
 };
 export declare class Connector extends EventEmitter {
     private channelSecret;

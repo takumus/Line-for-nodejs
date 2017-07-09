@@ -34,6 +34,13 @@ exports.create = {
             originalContentUrl: url,
             previewImageUrl: url
         };
+    },
+    VideoMessage: function (videoURL, thumbnailURL) {
+        return {
+            type: 'video',
+            originalContentUrl: videoURL,
+            previewImageUrl: thumbnailURL
+        };
     }
 };
 var Connector = (function (_super) {

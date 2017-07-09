@@ -24,6 +24,13 @@ export const create = {
             originalContentUrl: url,
             previewImageUrl: url
         };
+    },
+    VideoMessage: (videoURL: string, thumbnailURL: string) => {
+        return {
+            type: 'video',
+            originalContentUrl: videoURL,
+            previewImageUrl: thumbnailURL
+        };
     }
 };
 export class Connector extends EventEmitter {

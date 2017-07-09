@@ -88,6 +88,71 @@ export class Twitter extends EventEmitter {
             });
         });
     }
+
+    public getVideo(keyword: string) {
+        const options = {
+            method: 'GET',
+            json: true,
+            url: 'https://api.twitter.com/1.1/search/tweets.json',
+            qs: {
+                'q' : `${keyword} filter:videos min_retweets:1 exclude:retweets`,
+                'lang' : 'ja',
+                'count' : 100,
+                'result_type' : 'recent'
+            },
+            headers: {
+                'Authorization': 'Bearer ' + this.accessToken
+            }
+        };
+        return new Promise((resolve: (urls: Tweet[]) => void, reject) => {
+            this.get(options).then((data) => {
+                try {
+                    const statuses = data.statuses;
+                    if (statuses.length == 0) {
+                        reject(TwitterError.NOT_FOUND);
+                        return;
+                    }
+                    const mediaURLs: Tweet[] = [];
+                    statuses.forEach((t: any) => {
+                        if (!t.extended_entities) return;
+                        if (!t.extended_entities.media) return;
+                        if (!t.extended_entities.media[0]) return;
+                        if (!t.extended_entities.media[0].video_info) return;
+                        const video_info = t.extended_entities.media[0].video_info;
+                        const thumbnail_url = t.extended_entities.media[0].media_url_https;
+                        let maxBitrate = 0;
+                        let url = null;
+                        video_info.variants.forEach((v: any) => {
+                            if (maxBitrate < v.bitrate) {
+                                maxBitrate = v.bitrate;
+                                url = v.url;
+                            }
+                        });
+                        if (url) {
+                            const tweet: Tweet = {
+                                videoURL: url,
+                                imageURL: thumbnail_url,
+                                url: 'https://twitter.com/statuses/' + t.id_str
+                            };
+                            mediaURLs.push(tweet);
+                        }
+                    });
+                    if (mediaURLs.length > 0) {
+                        resolve(mediaURLs);
+                    }else {
+                        reject(TwitterError.NOT_FOUND);
+                    }
+                    return;
+                }catch (e) {
+                    console.log(e);
+                    reject(TwitterError.UNKNOWN_ERROR_1);
+                    return;
+                }
+            }).catch((e) => {
+                reject(e);
+            });
+        });
+    }
 }
 export enum TwitterError {
     NOT_FOUND,

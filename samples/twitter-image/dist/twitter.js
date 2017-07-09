@@ -49,14 +49,14 @@ var Twitter = (function (_super) {
             });
         });
     };
-    Twitter.prototype.getVideo = function (keyword) {
+    Twitter.prototype.getImage = function (keyword) {
         var _this = this;
         var options = {
             method: 'GET',
             json: true,
             url: 'https://api.twitter.com/1.1/search/tweets.json',
             qs: {
-                'q': keyword + " filter:videos min_retweets:1 exclude:retweets",
+                'q': keyword + " filter:images min_retweets:1 exclude:retweets",
                 'lang': 'ja',
                 'count': 100,
                 'result_type': 'recent'
@@ -75,9 +75,7 @@ var Twitter = (function (_super) {
                     }
                     var mediaURLs_1 = [];
                     statuses.forEach(function (t) {
-                        var extended_entities = t.extended_entities || [];
-                        var entities = t.entities.concat(extended_entities);
-                        var media = entities.media;
+                        var media = (t.extended_entities && t.extended_entities.media) ? t.extended_entities.media : t.entities.media;
                         if (media && media.length > 0) {
                             media.forEach(function (m) {
                                 var url = m.media_url_https;
@@ -109,14 +107,14 @@ var Twitter = (function (_super) {
             });
         });
     };
-    Twitter.prototype.getImage = function (keyword) {
+    Twitter.prototype.getVideo = function (keyword) {
         var _this = this;
         var options = {
             method: 'GET',
             json: true,
             url: 'https://api.twitter.com/1.1/search/tweets.json',
             qs: {
-                'q': keyword + " filter:images min_retweets:1 exclude:retweets",
+                'q': keyword + " filter:videos min_retweets:1 exclude:retweets",
                 'lang': 'ja',
                 'count': 100,
                 'result_type': 'recent'
@@ -135,18 +133,31 @@ var Twitter = (function (_super) {
                     }
                     var mediaURLs_2 = [];
                     statuses.forEach(function (t) {
-                        var media = (t.extended_entities && t.extended_entities.media) ? t.extended_entities.media : t.entities.media;
-                        if (media && media.length > 0) {
-                            media.forEach(function (m) {
-                                var url = m.media_url_https;
-                                if (url) {
-                                    var tweet = {
-                                        imageURL: url,
-                                        url: 'https://twitter.com/statuses/' + t.id_str
-                                    };
-                                    mediaURLs_2.push(tweet);
-                                }
-                            });
+                        if (!t.extended_entities)
+                            return;
+                        if (!t.extended_entities.media)
+                            return;
+                        if (!t.extended_entities.media[0])
+                            return;
+                        if (!t.extended_entities.media[0].video_info)
+                            return;
+                        var video_info = t.extended_entities.media[0].video_info;
+                        var thumbnail_url = t.extended_entities.media[0].media_url_https;
+                        var maxBitrate = 0;
+                        var url = null;
+                        video_info.variants.forEach(function (v) {
+                            if (maxBitrate < v.bitrate) {
+                                maxBitrate = v.bitrate;
+                                url = v.url;
+                            }
+                        });
+                        if (url) {
+                            var tweet = {
+                                videoURL: url,
+                                imageURL: thumbnail_url,
+                                url: 'https://twitter.com/statuses/' + t.id_str
+                            };
+                            mediaURLs_2.push(tweet);
                         }
                     });
                     if (mediaURLs_2.length > 0) {
