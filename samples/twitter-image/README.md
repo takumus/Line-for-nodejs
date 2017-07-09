@@ -10,3 +10,6 @@ consumerKeyとconsumerKeySecretだけで使えます。
 今回はsearchが使えればよかったのでこれでOK。  
 その辺は`src/twitter.ts`としてまとめてあります。  
 参考：<https://github.com/m-coding/twitter-application-only-auth>
+
+## こんな感じ
+<img src="https://raw.githubusercontent.com/takumus/Line-for-nodejs/master/samples/twitter-image/sample.png" width="320px">
