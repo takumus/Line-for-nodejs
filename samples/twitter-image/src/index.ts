@@ -1,6 +1,6 @@
 'use strict';
 
-import * as Line from '../../../libs/';
+import * as LINE from '../../../libs/';
 import { Twitter, TwitterError } from './twitter';
 
 const Config = require('../config');
@@ -10,7 +10,7 @@ const twitter = new Twitter(
     Config.twitter.consumerKeySecret
 );
 
-const line = new Line.Connector(
+const line = new LINE.Connector(
     Config.line.channelSecret,
     Config.line.channelAccessToken,
     Config.line.serverPort
@@ -20,7 +20,7 @@ twitter.on('init', () => {
     console.log('twitter is ready');
 });
 
-line.on('message', (message: Line.Message, replyToken: string, event: Line.Event) => {
+line.on('message', (message: LINE.Message, replyToken: string, event: LINE.Event) => {
     const id = event.source.groupId || event.source.roomId || event.source.userId;
     if (!message.text || message.text.indexOf('の画像') < 0) return;
     const query = message.text.split('の画像');
@@ -33,27 +33,27 @@ line.on('message', (message: Line.Message, replyToken: string, event: Line.Event
         if (isNaN(count)) count = 1;
     }
     if (!validate(keyword)) {
-        line.push(id, [Line.create.TextMessage('記号は使えないんだよ？w')]);
+        line.push(id, [LINE.create.TextMessage('記号は使えないんだよ？w')]);
         return;
     }
     twitter.getImage(keyword).then((tweets) => {
         count = count < tweets.length ? count : tweets.length;
-        line.push(id, [Line.create.TextMessage(`${keyword}の画像見つけた😀`)]);
+        line.push(id, [LINE.create.TextMessage(`${keyword}の画像見つけた😀`)]);
         setTimeout(() => {
-            line.push(id, [Line.create.TextMessage(`${count}枚送るよー!😎`)]);
+            line.push(id, [LINE.create.TextMessage(`${count}枚送るよー!😎`)]);
         }, 1000);
         for (let i = 0; i < count; i ++) {
             const tweet = tweets[i];
             setTimeout(() => {
-                line.push(id, [Line.create.ImageMessage(tweet.imageURL)]);
+                line.push(id, [LINE.create.ImageMessage(tweet.imageURL)]);
             }, i * 100 + 2000);
         }
     }).catch((e) => {
         let message = '';
         if (e == TwitterError.NOT_FOUND) {
             line.push(id, [
-                Line.create.TextMessage(`「${keyword}」は見つからないよー！😰`),
-                Line.create.ImageMessage(Config.app.notFoundImage)
+                LINE.create.TextMessage(`「${keyword}」は見つからないよー！😰`),
+                LINE.create.ImageMessage(Config.app.notFoundImage)
             ]);
             return;
         }else if (e == TwitterError.SERVER_ERROR) {
@@ -61,7 +61,7 @@ line.on('message', (message: Line.Message, replyToken: string, event: Line.Event
         }else {
             message = `変なエラーが出たよ！😥「${e}」`;
         }
-        line.push(id, [Line.create.TextMessage(message)]);
+        line.push(id, [LINE.create.TextMessage(message)]);
     });
     console.log(`${keyword}を${count}枚`);
 });
