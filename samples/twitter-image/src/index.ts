@@ -1,6 +1,6 @@
 'use strict';
 
-import { Line, LineEvent, LineMessage } from '../../../libs/';
+import { Line, LineEvent, LineMessage, LineSendMessage } from '../../../libs/';
 import { Twitter, TwitterError } from './twitter';
 
 const Config = require('../config');
@@ -26,6 +26,12 @@ line.on('message', (message: LineMessage, replyToken: string, event: LineEvent) 
     if (message.text.indexOf('の画像') < 0) return;
     const keyword = message.text.split('の画像')[0];
     if (!keyword) return;
+    let count: number = 1;
+    const countStr = message.text.split('の画像')[1];
+    if (countStr) {
+        count = Number(countStr.split('枚')[0]);
+        if (isNaN(count)) count = 1;
+    }
     if (!validate(keyword)) {
         line.push(id, [
             {
@@ -35,26 +41,33 @@ line.on('message', (message: LineMessage, replyToken: string, event: LineEvent) 
         ]);
         return;
     }
-
-    twitter.getImage(keyword).then((url) => {
-        line.push(id, [
-            {
-                type: 'text',
-                text: `${keyword}の画像だよ...!`
-            },
-            {
-                type: 'image',
-                originalContentUrl: url,
-                previewImageUrl: url
-            }
-        ]);
+    twitter.getImage(keyword).then((tweets) => {
+        count = count < tweets.length ? count : tweets.length;
+        line.push(id, [{
+            type: 'text',
+            text: `${keyword}の画像${count}枚送るよー!`
+        }]);
+        for (let i = 0; i < count; i ++) {
+            const tweet = tweets[i];
+            setTimeout(() => {
+                line.push(id, [{
+                    type: 'text',
+                    text: `${keyword}の画像${i + 1}枚目!`
+                },
+                {
+                    type: 'image',
+                    originalContentUrl: tweet.imageURL,
+                    previewImageUrl: tweet.imageURL
+                }]);
+            }, i * 100 + 1000);
+        }
     }).catch((e) => {
         let message = '';
         if (e == TwitterError.NOT_FOUND) {
             line.push(id, [
                 {
                     type: 'text',
-                    text: `「${keyword}」は見つからなかったぞ！😰`
+                    text: `「${keyword}」は見つからないよー！😰`
                 },
                 {
                     type: 'image',

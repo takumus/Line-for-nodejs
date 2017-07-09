@@ -40,8 +40,8 @@ var Twitter = (function (_super) {
             qs: {
                 'q': keyword + " filter:images min_retweets:1 exclude:retweets",
                 'lang': 'ja',
-                'count': 50,
-                'result_type': 'mixed'
+                'count': 100,
+                'result_type': 'recent'
             },
             headers: {
                 'Authorization': 'Bearer ' + this.accessToken
@@ -68,12 +68,16 @@ var Twitter = (function (_super) {
                         var media = entities.media;
                         if (media && media.length > 0) {
                             var url = media[0].media_url_https;
-                            if (url)
-                                mediaURLs_1.push(url);
+                            if (url) {
+                                var tweet_1 = {
+                                    imageURL: media[0].media_url_https
+                                };
+                                mediaURLs_1.push(tweet_1);
+                            }
                         }
                     });
                     if (mediaURLs_1.length > 0) {
-                        resolve(mediaURLs_1[Math.floor(mediaURLs_1.length * Math.random())]);
+                        resolve(mediaURLs_1);
                     }
                     else {
                         reject(TwitterError.NOT_FOUND);

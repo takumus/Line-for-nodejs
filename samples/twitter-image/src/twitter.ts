@@ -25,14 +25,14 @@ export class Twitter extends EventEmitter {
             qs: {
                 'q' : `${keyword} filter:images min_retweets:1 exclude:retweets`,
                 'lang' : 'ja',
-                'count' : 50,
-                'result_type' : 'mixed'
+                'count' : 100,
+                'result_type' : 'recent'
             },
             headers: {
                 'Authorization': 'Bearer ' + this.accessToken
             }
         };
-        return new Promise((resolve: (url: string) => void, reject) => {
+        return new Promise((resolve: (urls: Tweet[]) => void, reject) => {
             request(options, function(error, response, body) {
                 console.log(`getImage -> ${keyword}`);
                 if (error) {
@@ -47,17 +47,22 @@ export class Twitter extends EventEmitter {
                         reject(TwitterError.NOT_FOUND);
                         return;
                     }
-                    const mediaURLs: string[] = [];
+                    const mediaURLs: Tweet[] = [];
                     statuses.forEach((tweet: any) => {
                         const entities = tweet.entities;
                         const media = entities.media;
                         if (media && media.length > 0) {
                             const url = media[0].media_url_https;
-                            if (url) mediaURLs.push(url);
+                            if (url) {
+                                const tweet: Tweet = {
+                                    imageURL: media[0].media_url_https
+                                };
+                                mediaURLs.push(tweet);
+                            }
                         }
                     });
                     if (mediaURLs.length > 0) {
-                        resolve(mediaURLs[Math.floor(mediaURLs.length * Math.random())]);
+                        resolve(mediaURLs);
                     }else {
                         reject(TwitterError.NOT_FOUND);
                     }
@@ -76,4 +81,7 @@ export enum TwitterError {
     SERVER_ERROR,
     UNKNOWN_ERROR_1,
     UNKNOWN_ERROR_2
+}
+export interface Tweet {
+    imageURL: string;
 }

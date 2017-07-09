@@ -17,6 +17,13 @@ line.on('message', function (message, replyToken, event) {
     var keyword = message.text.split('の画像')[0];
     if (!keyword)
         return;
+    var count = 1;
+    var countStr = message.text.split('の画像')[1];
+    if (countStr) {
+        count = Number(countStr.split('枚')[0]);
+        if (isNaN(count))
+            count = 1;
+    }
     if (!validate(keyword)) {
         line.push(id, [
             {
@@ -26,25 +33,36 @@ line.on('message', function (message, replyToken, event) {
         ]);
         return;
     }
-    twitter.getImage(keyword).then(function (url) {
-        line.push(id, [
-            {
+    twitter.getImage(keyword).then(function (tweets) {
+        count = count < tweets.length ? count : tweets.length;
+        line.push(id, [{
                 type: 'text',
-                text: keyword + "\u306E\u753B\u50CF\u3060\u3088...!"
-            },
-            {
-                type: 'image',
-                originalContentUrl: url,
-                previewImageUrl: url
-            }
-        ]);
+                text: keyword + "\u306E\u753B\u50CF" + count + "\u679A\u9001\u308B\u3088\u30FC!"
+            }]);
+        var _loop_1 = function (i) {
+            var tweet = tweets[i];
+            setTimeout(function () {
+                line.push(id, [{
+                        type: 'text',
+                        text: keyword + "\u306E\u753B\u50CF" + (i + 1) + "\u679A\u76EE!"
+                    },
+                    {
+                        type: 'image',
+                        originalContentUrl: tweet.imageURL,
+                        previewImageUrl: tweet.imageURL
+                    }]);
+            }, i * 100 + 1000);
+        };
+        for (var i = 0; i < count; i++) {
+            _loop_1(i);
+        }
     })["catch"](function (e) {
         var message = '';
         if (e == twitter_1.TwitterError.NOT_FOUND) {
             line.push(id, [
                 {
                     type: 'text',
-                    text: "\u300C" + keyword + "\u300D\u306F\u898B\u3064\u304B\u3089\u306A\u304B\u3063\u305F\u305E\uFF01\uD83D\uDE30"
+                    text: "\u300C" + keyword + "\u300D\u306F\u898B\u3064\u304B\u3089\u306A\u3044\u3088\u30FC\uFF01\uD83D\uDE30"
                 },
                 {
                     type: 'image',
