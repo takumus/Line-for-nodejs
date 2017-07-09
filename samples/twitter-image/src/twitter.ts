@@ -23,7 +23,7 @@ export class Twitter extends EventEmitter {
             json: true,
             url: 'https://api.twitter.com/1.1/search/tweets.json',
             qs: {
-                'q' : `${keyword} filter:images min_retweets:1`,
+                'q' : `${keyword} filter:images min_retweets:1 exclude:retweets`,
                 'lang' : 'ja',
                 'count' : 50,
                 'result_type' : 'mixed'
@@ -47,22 +47,26 @@ export class Twitter extends EventEmitter {
                         reject(TwitterError.NOT_FOUND);
                         return;
                     }
-                    const tweet = statuses[Math.floor(statuses.length * Math.random())];
-                    const entities = tweet.entities;
-                    const media = entities.media[0];
-                    const url = media.media_url_https;
-                    if (url) {
-                        resolve(url);
-                        return;
+                    const mediaURLs: string[] = [];
+                    statuses.forEach((tweet: any) => {
+                        const entities = tweet.entities;
+                        const media = entities.media;
+                        if (media && media.length > 0) {
+                            const url = media[0].media_url_https;
+                            if (url) mediaURLs.push(url);
+                        }
+                    });
+                    if (mediaURLs.length > 0) {
+                        resolve(mediaURLs[Math.floor(mediaURLs.length * Math.random())]);
+                    }else {
+                        reject(TwitterError.NOT_FOUND);
                     }
+                    return;
                 }catch (e) {
-                    console.log(statuses);
                     console.log(e);
                     reject(TwitterError.UNKNOWN_ERROR_1);
                     return;
                 }
-                console.log(statuses);
-                reject(TwitterError.UNKNOWN_ERROR_2);
             });
         });
     }

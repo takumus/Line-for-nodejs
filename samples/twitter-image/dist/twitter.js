@@ -38,7 +38,7 @@ var Twitter = (function (_super) {
             json: true,
             url: 'https://api.twitter.com/1.1/search/tweets.json',
             qs: {
-                'q': keyword + " filter:images min_retweets:1",
+                'q': keyword + " filter:images min_retweets:1 exclude:retweets",
                 'lang': 'ja',
                 'count': 50,
                 'result_type': 'mixed'
@@ -62,23 +62,29 @@ var Twitter = (function (_super) {
                         reject(TwitterError.NOT_FOUND);
                         return;
                     }
-                    var tweet = statuses[Math.floor(statuses.length * Math.random())];
-                    var entities = tweet.entities;
-                    var media = entities.media[0];
-                    var url = media.media_url_https;
-                    if (url) {
-                        resolve(url);
-                        return;
+                    var mediaURLs_1 = [];
+                    statuses.forEach(function (tweet) {
+                        var entities = tweet.entities;
+                        var media = entities.media;
+                        if (media && media.length > 0) {
+                            var url = media[0].media_url_https;
+                            if (url)
+                                mediaURLs_1.push(url);
+                        }
+                    });
+                    if (mediaURLs_1.length > 0) {
+                        resolve(mediaURLs_1[Math.floor(mediaURLs_1.length * Math.random())]);
                     }
+                    else {
+                        reject(TwitterError.NOT_FOUND);
+                    }
+                    return;
                 }
                 catch (e) {
-                    console.log(statuses);
                     console.log(e);
                     reject(TwitterError.UNKNOWN_ERROR_1);
                     return;
                 }
-                console.log(statuses);
-                reject(TwitterError.UNKNOWN_ERROR_2);
             });
         });
     };

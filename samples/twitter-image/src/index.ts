@@ -51,9 +51,20 @@ line.on('message', (message: LineMessage, replyToken: string, event: LineEvent) 
     }).catch((e) => {
         let message = '';
         if (e == TwitterError.NOT_FOUND) {
-            message = `「${keyword}」は見つからなかったぞ！😰`;
+            line.push(id, [
+                {
+                    type: 'text',
+                    text: `「${keyword}」は見つからなかったぞ！😰`
+                },
+                {
+                    type: 'image',
+                    originalContentUrl: Config.app.notFoundImage,
+                    previewImageUrl: Config.app.notFoundImage
+                }
+            ]);
+            return;
         }else if (e == TwitterError.SERVER_ERROR) {
-            message = 'サーバルエラーだよ！😫';
+            message = 'インターナルサーバルエラーだよ！😫';
         }else {
             message = `変なエラーが出たよ！😥「${e}」`;
         }

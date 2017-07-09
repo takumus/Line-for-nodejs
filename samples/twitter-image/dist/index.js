@@ -41,10 +41,21 @@ line.on('message', function (message, replyToken, event) {
     })["catch"](function (e) {
         var message = '';
         if (e == twitter_1.TwitterError.NOT_FOUND) {
-            message = "\u300C" + keyword + "\u300D\u306F\u898B\u3064\u304B\u3089\u306A\u304B\u3063\u305F\u305E\uFF01\uD83D\uDE30";
+            line.push(id, [
+                {
+                    type: 'text',
+                    text: "\u300C" + keyword + "\u300D\u306F\u898B\u3064\u304B\u3089\u306A\u304B\u3063\u305F\u305E\uFF01\uD83D\uDE30"
+                },
+                {
+                    type: 'image',
+                    originalContentUrl: Config.app.notFoundImage,
+                    previewImageUrl: Config.app.notFoundImage
+                }
+            ]);
+            return;
         }
         else if (e == twitter_1.TwitterError.SERVER_ERROR) {
-            message = 'サーバルエラーだよ！😫';
+            message = 'インターナルサーバルエラーだよ！😫';
         }
         else {
             message = "\u5909\u306A\u30A8\u30E9\u30FC\u304C\u51FA\u305F\u3088\uFF01\uD83D\uDE25\u300C" + e + "\u300D";
