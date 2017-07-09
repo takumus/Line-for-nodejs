@@ -12,9 +12,9 @@
 おうむ返しするコードです。
 
 ```js
-const Line = require('./line').Line;
+const LineConnector = require('./line').Connector;
 
-const line = new Line(
+const line = new LineConnector(
     "XXXXXX",                      //シークレット
     "XXXXXX",                      //アクセストークン
     3000                           //自分のwebhockのサーバーのポート
