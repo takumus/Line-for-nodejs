@@ -21,9 +21,24 @@ exports.API = {
     reply_path: '/v2/bot/message/reply',
     profile_path: '/v2/bot/profile'
 };
-var Line = (function (_super) {
-    __extends(Line, _super);
-    function Line(channelSecret, channelAccessToken, serverPort) {
+exports.create = {
+    TextMessage: function (message) {
+        return {
+            type: 'text',
+            text: message
+        };
+    },
+    ImageMessage: function (url) {
+        return {
+            type: 'image',
+            originalContentUrl: url,
+            previewImageUrl: url
+        };
+    }
+};
+var Connector = (function (_super) {
+    __extends(Connector, _super);
+    function Connector(channelSecret, channelAccessToken, serverPort) {
         var _this = _super.call(this) || this;
         _this.channelSecret = channelSecret;
         _this.channelAccessToken = channelAccessToken;
@@ -31,7 +46,7 @@ var Line = (function (_super) {
         _this.init();
         return _this;
     }
-    Line.prototype.init = function () {
+    Connector.prototype.init = function () {
         var _this = this;
         http.createServer(function (req, res) {
             if (req.method !== 'POST') {
@@ -53,7 +68,7 @@ var Line = (function (_super) {
             });
         }).listen(this.serverPort);
     };
-    Line.prototype.onData = function (data) {
+    Connector.prototype.onData = function (data) {
         var _this = this;
         this.emit('data', data);
         if (data.events) {
@@ -62,16 +77,16 @@ var Line = (function (_super) {
             });
         }
     };
-    Line.prototype.onEvent = function (event, id) {
+    Connector.prototype.onEvent = function (event, id) {
         this.emit('event', event, id);
         if (event.type === 'message') {
             this.onMessage(event.message, event.replyToken, event);
         }
     };
-    Line.prototype.onMessage = function (message, replyToken, event) {
+    Connector.prototype.onMessage = function (message, replyToken, event) {
         this.emit('message', message, replyToken, event);
     };
-    Line.prototype.send = function (path, data) {
+    Connector.prototype.send = function (path, data) {
         var _this = this;
         var dataStr = JSON.stringify(data);
         return new Promise(function (resolve, reject) {
@@ -96,7 +111,7 @@ var Line = (function (_super) {
             req.end();
         });
     };
-    Line.prototype.get = function (path) {
+    Connector.prototype.get = function (path) {
         var _this = this;
         return new Promise(function (resolve, reject) {
             var req = https.request({
@@ -126,27 +141,27 @@ var Line = (function (_super) {
             req.end();
         });
     };
-    Line.prototype.push = function (to, messages) {
+    Connector.prototype.push = function (to, messages) {
         return this.send(exports.API.push_path, {
             to: to,
             'messages': messages
         });
     };
-    Line.prototype.multicast = function (to, messages) {
+    Connector.prototype.multicast = function (to, messages) {
         return this.send(exports.API.multicast_path, {
             to: to,
             'messages': messages
         });
     };
-    Line.prototype.reply = function (replyToken, messages) {
+    Connector.prototype.reply = function (replyToken, messages) {
         return this.send(exports.API.reply_path, {
             replyToken: replyToken,
             'messages': messages
         });
     };
-    Line.prototype.getProfile = function (userId) {
+    Connector.prototype.getProfile = function (userId) {
         return this.get(exports.API.profile_path + '/' + userId);
     };
-    return Line;
+    return Connector;
 }(events_1.EventEmitter));
-exports.Line = Line;
+exports.Connector = Connector;

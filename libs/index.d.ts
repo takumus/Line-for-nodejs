@@ -1,5 +1,7 @@
 /// <reference types="node" />
 import { EventEmitter } from 'events';
+import { SendMessage } from './types';
+export * from './types';
 export declare const API: {
     host: string;
     push_path: string;
@@ -7,7 +9,18 @@ export declare const API: {
     reply_path: string;
     profile_path: string;
 };
-export declare class Line extends EventEmitter {
+export declare const create: {
+    TextMessage: (message: string) => {
+        type: string;
+        text: string;
+    };
+    ImageMessage: (url: string) => {
+        type: string;
+        originalContentUrl: string;
+        previewImageUrl: string;
+    };
+};
+export declare class Connector extends EventEmitter {
     private channelSecret;
     private channelAccessToken;
     private serverPort;
@@ -18,39 +31,8 @@ export declare class Line extends EventEmitter {
     private onMessage(message, replyToken, event);
     send(path: string, data: any): Promise<{}>;
     get(path: string): Promise<{}>;
-    push(to: string, messages: LineSendMessage[]): Promise<{}>;
-    multicast(to: string, messages: LineSendMessage[]): Promise<{}>;
-    reply(replyToken: string, messages: LineSendMessage[]): Promise<{}>;
+    push(to: string, messages: SendMessage[]): Promise<{}>;
+    multicast(to: string, messages: SendMessage[]): Promise<{}>;
+    reply(replyToken: string, messages: SendMessage[]): Promise<{}>;
     getProfile(userId: string): Promise<{}>;
-}
-export interface LineData {
-    events: LineEvent[];
-}
-export interface LineMessage {
-    id: string;
-    type: string;
-    text: string;
-}
-export interface LineSendMessage {
-    type: string;
-    text?: string;
-    originalContentUrl?: string;
-    previewImageUrl?: string;
-}
-export interface LineEvent {
-    replyToken: string;
-    type: string;
-    timestamp: string;
-    source: {
-        type: string;
-        userId: string;
-        groupId: string;
-    };
-    message: LineMessage;
-}
-export interface LineProfile {
-    displayName: string;
-    userId: string;
-    pictureUrl: string;
-    statusMessage: string;
 }

@@ -2,7 +2,8 @@ import * as http from 'http';
 import * as https from 'https';
 import * as crypto from 'crypto';
 import { EventEmitter } from 'events';
-
+import { Data, Event, Message, SendMessage } from './types';
+export * from './types';
 export const API = {
     host: 'api.line.me',
     push_path: '/v2/bot/message/push',
@@ -10,8 +11,22 @@ export const API = {
     reply_path: '/v2/bot/message/reply',
     profile_path: '/v2/bot/profile'
 };
-
-export class Line extends EventEmitter {
+export const create = {
+    TextMessage: (message: string) => {
+        return {
+            type: 'text',
+            text: message
+        };
+    },
+    ImageMessage: (url: string) => {
+        return {
+            type: 'image',
+            originalContentUrl: url,
+            previewImageUrl: url
+        };
+    }
+};
+export class Connector extends EventEmitter {
     private channelSecret: string;
     private channelAccessToken: string;
     private serverPort: number;
@@ -42,7 +57,7 @@ export class Line extends EventEmitter {
 
         }).listen(this.serverPort);
     }
-    private onData(data: LineData) {
+    private onData(data: Data) {
         this.emit('data', data);
         if (data.events) {
             data.events.forEach((event, id) => {
@@ -50,13 +65,13 @@ export class Line extends EventEmitter {
             });
         }
     }
-    private onEvent(event: LineEvent, id: number) {
+    private onEvent(event: Event, id: number) {
         this.emit('event', event, id);
         if (event.type === 'message') {
             this.onMessage(event.message, event.replyToken, event);
         }
     }
-    private onMessage(message: LineMessage, replyToken: string, event: LineEvent) {
+    private onMessage(message: Message, replyToken: string, event: Event) {
         this.emit('message', message, replyToken, event);
     }
     public send(path: string, data: any) {
@@ -111,19 +126,19 @@ export class Line extends EventEmitter {
             req.end();
         });
     }
-    public push(to: string, messages: LineSendMessage[]) {
+    public push(to: string, messages: SendMessage[]) {
         return this.send(API.push_path, {
             to: to,
             'messages': messages
         });
     }
-    public multicast(to: string, messages: LineSendMessage[]) {
+    public multicast(to: string, messages: SendMessage[]) {
         return this.send(API.multicast_path, {
             to: to,
             'messages': messages
         });
     }
-    public reply(replyToken: string, messages: LineSendMessage[]) {
+    public reply(replyToken: string, messages: SendMessage[]) {
         return this.send(API.reply_path, {
             replyToken: replyToken,
             'messages': messages
@@ -132,35 +147,4 @@ export class Line extends EventEmitter {
     public getProfile(userId: string) {
         return this.get(API.profile_path + '/' + userId);
     }
-}
-export interface LineData {
-    events: LineEvent[];
-}
-export interface LineMessage {
-    id: string;
-    type: string;
-    text: string;
-}
-export interface LineSendMessage {
-    type: string;
-    text?: string;
-    originalContentUrl?: string;
-    previewImageUrl?: string;
-}
-export interface LineEvent {
-    replyToken: string;
-    type: string;
-    timestamp: string;
-    source: {
-        type: string;
-        userId: string;
-        groupId: string;
-    };
-    message: LineMessage;
-}
-export interface LineProfile {
-    displayName: string;
-    userId: string;
-    pictureUrl: string;
-    statusMessage: string;
 }
