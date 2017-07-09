@@ -34,16 +34,25 @@ export class Twitter extends EventEmitter {
         };
         return new Promise((resolve: (url: string) => void, reject) => {
             request(options, function(error, response, body) {
-                if (error) reject('error');
+                if (error) {
+                    console.log(error);
+                    reject('error');
+                    return;
+                }
                 try {
                     const statuses = eval(body).statuses;
                     const tweet = statuses[Math.floor(statuses.length * Math.random())];
                     const entities = tweet.entities;
                     const media = entities.media[0];
                     const url = media.media_url_https;
-                    if (url) resolve(url);
+                    if (url) {
+                        resolve(url);
+                        return;
+                    }
                 }catch (e) {
+                    console.log(e);
                     reject('error');
+                    return;
                 }
                 reject('error');
             });

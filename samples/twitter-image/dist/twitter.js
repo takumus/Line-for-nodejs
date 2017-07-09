@@ -49,19 +49,26 @@ var Twitter = (function (_super) {
         };
         return new Promise(function (resolve, reject) {
             request(options, function (error, response, body) {
-                if (error)
+                if (error) {
+                    console.log(error);
                     reject('error');
+                    return;
+                }
                 try {
                     var statuses = eval(body).statuses;
                     var tweet = statuses[Math.floor(statuses.length * Math.random())];
                     var entities = tweet.entities;
                     var media = entities.media[0];
                     var url = media.media_url_https;
-                    if (url)
+                    if (url) {
                         resolve(url);
+                        return;
+                    }
                 }
                 catch (e) {
+                    console.log(e);
                     reject('error');
+                    return;
                 }
                 reject('error');
             });

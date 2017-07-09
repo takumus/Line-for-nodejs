@@ -5,24 +5,11 @@ var twitter_1 = require("./twitter");
 var Config = require('../config');
 var twitter = new twitter_1.Twitter(Config.twitter.consumerKey, Config.twitter.consumerKeySecret);
 var line = new _1.Line(Config.line.channelSecret, Config.line.channelAccessToken, Config.line.serverPort);
-var working = {};
 twitter.on('init', function () {
     console.log('twitter is ready');
 });
-// メッセージが来た時。
 line.on('message', function (message, replyToken, event) {
     var id = event.source.groupId || event.source.userId;
-    if (!working[id])
-        working[id] = 0;
-    if (working[id] > 2) {
-        line.push(id, [
-            {
-                type: 'text',
-                text: 'ちょっと待てw'
-            }
-        ]);
-        return;
-    }
     if (!message.text)
         return;
     if (message.text.indexOf('の画像') < 0)
@@ -30,8 +17,16 @@ line.on('message', function (message, replyToken, event) {
     var keyword = message.text.split('の画像')[0];
     if (!keyword)
         return;
+    if (!validate(keyword)) {
+        line.push(id, [
+            {
+                type: 'text',
+                text: '記号は使えないんだよ？w'
+            }
+        ]);
+        return;
+    }
     twitter.getImage(keyword).then(function (url) {
-        working[id]--;
         line.push(id, [
             {
                 type: 'image',
@@ -40,7 +35,6 @@ line.on('message', function (message, replyToken, event) {
             }
         ]);
     })["catch"](function (e) {
-        working[id]--;
         line.push(id, [
             {
                 type: 'text',
@@ -49,5 +43,12 @@ line.on('message', function (message, replyToken, event) {
         ]);
     });
     console.log(keyword);
-    working[id]++;
 });
+var doNotUses = ['"', "'", '/', '\\', '<', '>', '`', '?'];
+function validate(keyword) {
+    for (var i = 0; i < doNotUses.length; i++) {
+        if (keyword.indexOf(doNotUses[i]) >= 0)
+            return false;
+    }
+    return true;
+}
