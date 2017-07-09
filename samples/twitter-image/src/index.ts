@@ -45,7 +45,10 @@ line.on('message', (message: LINE.Message, replyToken: string, event: LINE.Event
         for (let i = 0; i < count; i ++) {
             const tweet = tweets[i];
             setTimeout(() => {
-                line.push(id, [LINE.create.ImageMessage(tweet.imageURL)]);
+                line.push(id, [
+                    LINE.create.ImageMessage(tweet.imageURL),
+                    LINE.create.TextMessage(tweet.url)
+                ]);
             }, i * 100 + 2000);
         }
     }).catch((e) => {

@@ -36,7 +36,10 @@ line.on('message', function (message, replyToken, event) {
         var _loop_1 = function (i) {
             var tweet = tweets[i];
             setTimeout(function () {
-                line.push(id, [LINE.create.ImageMessage(tweet.imageURL)]);
+                line.push(id, [
+                    LINE.create.ImageMessage(tweet.imageURL),
+                    LINE.create.TextMessage(tweet.url)
+                ]);
             }, i * 100 + 2000);
         };
         for (var i = 0; i < count; i++) {

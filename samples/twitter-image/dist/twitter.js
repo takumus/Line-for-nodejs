@@ -32,13 +32,31 @@ var Twitter = (function (_super) {
         });
         return _this;
     }
-    Twitter.prototype.getImage = function (keyword) {
+    Twitter.prototype.get = function (options) {
+        return new Promise(function (resolve, reject) {
+            request(options, function (error, response, body) {
+                if (error) {
+                    console.log(error);
+                    reject(TwitterError.SERVER_ERROR);
+                    return;
+                }
+                try {
+                    resolve(eval(body));
+                }
+                catch (e) {
+                    reject(TwitterError.UNKNOWN_ERROR_1);
+                }
+            });
+        });
+    };
+    Twitter.prototype.getVideo = function (keyword) {
+        var _this = this;
         var options = {
             method: 'GET',
             json: true,
             url: 'https://api.twitter.com/1.1/search/tweets.json',
             qs: {
-                'q': keyword + " filter:images min_retweets:1 exclude:retweets",
+                'q': keyword + " filter:videos min_retweets:1 exclude:retweets",
                 'lang': 'ja',
                 'count': 100,
                 'result_type': 'recent'
@@ -48,31 +66,29 @@ var Twitter = (function (_super) {
             }
         };
         return new Promise(function (resolve, reject) {
-            request(options, function (error, response, body) {
-                if (error) {
-                    console.log(error);
-                    reject(TwitterError.SERVER_ERROR);
-                    return;
-                }
-                var statuses;
+            _this.get(options).then(function (data) {
                 try {
-                    statuses = eval(body).statuses;
+                    var statuses = data.statuses;
                     if (statuses.length == 0) {
                         reject(TwitterError.NOT_FOUND);
                         return;
                     }
                     var mediaURLs_1 = [];
-                    statuses.forEach(function (tweet) {
-                        var entities = tweet.entities;
+                    statuses.forEach(function (t) {
+                        var extended_entities = t.extended_entities || [];
+                        var entities = t.entities.concat(extended_entities);
                         var media = entities.media;
                         if (media && media.length > 0) {
-                            var url = media[0].media_url_https;
-                            if (url) {
-                                var tweet_1 = {
-                                    imageURL: media[0].media_url_https
-                                };
-                                mediaURLs_1.push(tweet_1);
-                            }
+                            media.forEach(function (m) {
+                                var url = m.media_url_https;
+                                if (url) {
+                                    var tweet = {
+                                        imageURL: url,
+                                        url: 'https://twitter.com/statuses/' + t.id_str
+                                    };
+                                    mediaURLs_1.push(tweet);
+                                }
+                            });
                         }
                     });
                     if (mediaURLs_1.length > 0) {
@@ -88,6 +104,66 @@ var Twitter = (function (_super) {
                     reject(TwitterError.UNKNOWN_ERROR_1);
                     return;
                 }
+            })["catch"](function (e) {
+                reject(e);
+            });
+        });
+    };
+    Twitter.prototype.getImage = function (keyword) {
+        var _this = this;
+        var options = {
+            method: 'GET',
+            json: true,
+            url: 'https://api.twitter.com/1.1/search/tweets.json',
+            qs: {
+                'q': keyword + " filter:images min_retweets:1 exclude:retweets",
+                'lang': 'ja',
+                'count': 100,
+                'result_type': 'recent'
+            },
+            headers: {
+                'Authorization': 'Bearer ' + this.accessToken
+            }
+        };
+        return new Promise(function (resolve, reject) {
+            _this.get(options).then(function (data) {
+                try {
+                    var statuses = data.statuses;
+                    if (statuses.length == 0) {
+                        reject(TwitterError.NOT_FOUND);
+                        return;
+                    }
+                    var mediaURLs_2 = [];
+                    statuses.forEach(function (t) {
+                        var media = (t.extended_entities && t.extended_entities.media) ? t.extended_entities.media : t.entities.media;
+                        if (media && media.length > 0) {
+                            media.forEach(function (m) {
+                                var url = m.media_url_https;
+                                if (url) {
+                                    var tweet = {
+                                        imageURL: url,
+                                        url: 'https://twitter.com/statuses/' + t.id_str
+                                    };
+                                    mediaURLs_2.push(tweet);
+                                }
+                            });
+                        }
+                    });
+                    if (mediaURLs_2.length > 0) {
+                        resolve(mediaURLs_2);
+                    }
+                    else {
+                        reject(TwitterError.NOT_FOUND);
+                    }
+                    return;
+                }
+                catch (e) {
+                    console.log(e);
+                    reject(TwitterError.UNKNOWN_ERROR_1);
+                    return;
+                }
+            })["catch"](function (e) {
+                reject(e);
             });
         });
     };
