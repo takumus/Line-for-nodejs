@@ -49,7 +49,6 @@ var Twitter = (function (_super) {
         };
         return new Promise(function (resolve, reject) {
             request(options, function (error, response, body) {
-                console.log("getImage -> " + keyword);
                 if (error) {
                     console.log(error);
                     reject(TwitterError.SERVER_ERROR);

@@ -34,7 +34,6 @@ export class Twitter extends EventEmitter {
         };
         return new Promise((resolve: (urls: Tweet[]) => void, reject) => {
             request(options, function(error, response, body) {
-                console.log(`getImage -> ${keyword}`);
                 if (error) {
                     console.log(error);
                     reject(TwitterError.SERVER_ERROR);
