@@ -49,13 +49,19 @@ var Twitter = (function (_super) {
         };
         return new Promise(function (resolve, reject) {
             request(options, function (error, response, body) {
+                console.log("getImage -> " + keyword);
                 if (error) {
                     console.log(error);
-                    reject('error');
+                    reject(TwitterError.SERVER_ERROR);
                     return;
                 }
+                var statuses;
                 try {
-                    var statuses = eval(body).statuses;
+                    statuses = eval(body).statuses;
+                    if (statuses.length == 0) {
+                        reject(TwitterError.NOT_FOUND);
+                        return;
+                    }
                     var tweet = statuses[Math.floor(statuses.length * Math.random())];
                     var entities = tweet.entities;
                     var media = entities.media[0];
@@ -66,14 +72,23 @@ var Twitter = (function (_super) {
                     }
                 }
                 catch (e) {
+                    console.log(statuses);
                     console.log(e);
-                    reject('error');
+                    reject(TwitterError.UNKNOWN_ERROR_1);
                     return;
                 }
-                reject('error');
+                console.log(statuses);
+                reject(TwitterError.UNKNOWN_ERROR_2);
             });
         });
     };
     return Twitter;
 }(events_1.EventEmitter));
 exports.Twitter = Twitter;
+var TwitterError;
+(function (TwitterError) {
+    TwitterError[TwitterError["NOT_FOUND"] = 0] = "NOT_FOUND";
+    TwitterError[TwitterError["SERVER_ERROR"] = 1] = "SERVER_ERROR";
+    TwitterError[TwitterError["UNKNOWN_ERROR_1"] = 2] = "UNKNOWN_ERROR_1";
+    TwitterError[TwitterError["UNKNOWN_ERROR_2"] = 3] = "UNKNOWN_ERROR_2";
+})(TwitterError = exports.TwitterError || (exports.TwitterError = {}));

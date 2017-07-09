@@ -1,7 +1,7 @@
 'use strict';
 
 import { Line, LineEvent, LineMessage } from '../../../libs/';
-import { Twitter } from './twitter';
+import { Twitter, TwitterError } from './twitter';
 
 const Config = require('../config');
 
@@ -49,14 +49,21 @@ line.on('message', (message: LineMessage, replyToken: string, event: LineEvent) 
             }
         ]);
     }).catch((e) => {
+        let message = '';
+        if (e == TwitterError.NOT_FOUND) {
+            message = `「${keyword}」は見つからなかったぞ！😰`;
+        }else if (e == TwitterError.SERVER_ERROR) {
+            message = 'サーバルエラーだよ！😫';
+        }else {
+            message = `変なエラーが出たよ！😥「${e}」`;
+        }
         line.push(id, [
             {
                 type: 'text',
-                text: `${keyword}の画像が無かったぞw`
+                text: message
             }
         ]);
     });
-    console.log(keyword);
 });
 
 const doNotUses = ['"', "'", '/', '\\', '<', '>', '`', '?'];

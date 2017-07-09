@@ -34,13 +34,19 @@ export class Twitter extends EventEmitter {
         };
         return new Promise((resolve: (url: string) => void, reject) => {
             request(options, function(error, response, body) {
+                console.log(`getImage -> ${keyword}`);
                 if (error) {
                     console.log(error);
-                    reject('error');
+                    reject(TwitterError.SERVER_ERROR);
                     return;
                 }
+                let statuses;
                 try {
-                    const statuses = eval(body).statuses;
+                    statuses = eval(body).statuses;
+                    if (statuses.length == 0) {
+                        reject(TwitterError.NOT_FOUND);
+                        return;
+                    }
                     const tweet = statuses[Math.floor(statuses.length * Math.random())];
                     const entities = tweet.entities;
                     const media = entities.media[0];
@@ -50,12 +56,20 @@ export class Twitter extends EventEmitter {
                         return;
                     }
                 }catch (e) {
+                    console.log(statuses);
                     console.log(e);
-                    reject('error');
+                    reject(TwitterError.UNKNOWN_ERROR_1);
                     return;
                 }
-                reject('error');
+                console.log(statuses);
+                reject(TwitterError.UNKNOWN_ERROR_2);
             });
         });
     }
+}
+export enum TwitterError {
+    NOT_FOUND,
+    SERVER_ERROR,
+    UNKNOWN_ERROR_1,
+    UNKNOWN_ERROR_2
 }
