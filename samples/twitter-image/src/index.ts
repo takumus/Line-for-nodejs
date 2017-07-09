@@ -1,7 +1,6 @@
 'use strict';
 
-import * as http from 'http';
-import { Line, LineData, LineEvent, LineMessage, LineProfile } from '../../../libs/';
+import { Line, LineEvent, LineMessage } from '../../../libs/';
 import { Twitter } from './twitter';
 
 const Config = require('../config');
@@ -40,6 +39,10 @@ line.on('message', (message: LineMessage, replyToken: string, event: LineEvent) 
     twitter.getImage(keyword).then((url) => {
         line.push(id, [
             {
+                type: 'text',
+                text: `${keyword}の画像だよ...!`
+            },
+            {
                 type: 'image',
                 originalContentUrl: url,
                 previewImageUrl: url
@@ -49,7 +52,7 @@ line.on('message', (message: LineMessage, replyToken: string, event: LineEvent) 
         line.push(id, [
             {
                 type: 'text',
-                text: `${keyword}の画像が無かったぞ`
+                text: `${keyword}の画像が無かったぞw`
             }
         ]);
     });

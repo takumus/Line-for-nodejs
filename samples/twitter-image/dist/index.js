@@ -29,6 +29,10 @@ line.on('message', function (message, replyToken, event) {
     twitter.getImage(keyword).then(function (url) {
         line.push(id, [
             {
+                type: 'text',
+                text: keyword + "\u306E\u753B\u50CF\u3060\u3088...!"
+            },
+            {
                 type: 'image',
                 originalContentUrl: url,
                 previewImageUrl: url
@@ -38,7 +42,7 @@ line.on('message', function (message, replyToken, event) {
         line.push(id, [
             {
                 type: 'text',
-                text: keyword + "\u306E\u753B\u50CF\u304C\u7121\u304B\u3063\u305F\u305E"
+                text: keyword + "\u306E\u753B\u50CF\u304C\u7121\u304B\u3063\u305F\u305Ew"
             }
         ]);
     });
