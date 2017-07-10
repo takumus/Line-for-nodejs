@@ -36,6 +36,10 @@ line.on('message', function (message, replyToken, event) {
         if (count < 0)
             count = 1;
     }
+    if (count > 10) {
+        line.push(id, [LINE.create.TextMessage('枚数は10枚までになったよ！')]);
+        return;
+    }
     if (!validate(keyword)) {
         line.push(id, [LINE.create.TextMessage('記号は使えないんだよ？w')]);
         return;
@@ -47,6 +51,14 @@ line.on('message', function (message, replyToken, event) {
         setTimeout(function () {
             line.push(id, [LINE.create.TextMessage(count + "\u679A\u9001\u308B\u3088\u30FC!\uD83D\uDE0E")]);
         }, 1000);
+        var sumFavotite = 0;
+        tweets.sort(function (a, b) {
+            return b.favorite - a.favorite;
+        });
+        tweets.forEach(function (t) {
+            sumFavotite += t.favorite;
+        });
+        var avgFavorite = sumFavotite / tweets.length;
         var _loop_1 = function (i) {
             var tweet = tweets[i];
             setTimeout(function () {

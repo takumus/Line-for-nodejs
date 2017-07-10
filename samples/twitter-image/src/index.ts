@@ -43,6 +43,10 @@ line.on('message', (message: LINE.Message, replyToken: string, event: LINE.Event
         count = convertToNumber(countStr.split('枚')[0]);
         if (count < 0) count = 1;
     }
+    if (count > 10) {
+        line.push(id, [LINE.create.TextMessage('枚数は10枚までになったよ！')]);
+        return;
+    }
     if (!validate(keyword)) {
         line.push(id, [LINE.create.TextMessage('記号は使えないんだよ？w')]);
         return;
@@ -55,6 +59,14 @@ line.on('message', (message: LINE.Message, replyToken: string, event: LINE.Event
         setTimeout(() => {
             line.push(id, [LINE.create.TextMessage(`${count}枚送るよー!😎`)]);
         }, 1000);
+        let sumFavotite = 0;
+        tweets.sort((a, b) => {
+            return b.favorite - a.favorite;
+        });
+        tweets.forEach((t) => {
+            sumFavotite += t.favorite;
+        });
+        const avgFavorite = sumFavotite / tweets.length;
         for (let i = 0; i < count; i ++) {
             const tweet = tweets[i];
             setTimeout(() => {

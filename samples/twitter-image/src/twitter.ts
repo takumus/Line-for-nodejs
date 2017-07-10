@@ -41,7 +41,7 @@ export class Twitter extends EventEmitter {
             qs: {
                 'q' : `${keyword} filter:images min_retweets:1 exclude:retweets`,
                 'lang' : 'ja',
-                'count' : 100,
+                'count' : 20,
                 'result_type' : 'recent'
             },
             headers: {
@@ -65,7 +65,8 @@ export class Twitter extends EventEmitter {
                                 if (url) {
                                     const tweet: Tweet = {
                                         imageURL: url,
-                                        url: 'https://twitter.com/statuses/' + t.id_str
+                                        url: 'https://twitter.com/statuses/' + t.id_str,
+                                        favorite: t.favorite_count
                                     };
                                     mediaURLs.push(tweet);
                                 }
@@ -97,7 +98,7 @@ export class Twitter extends EventEmitter {
             qs: {
                 'q' : `${keyword} filter:videos min_retweets:1 exclude:retweets`,
                 'lang' : 'ja',
-                'count' : 100,
+                'count' : 20,
                 'result_type' : 'recent'
             },
             headers: {
@@ -132,7 +133,8 @@ export class Twitter extends EventEmitter {
                             const tweet: Tweet = {
                                 videoURL: url,
                                 imageURL: thumbnail_url,
-                                url: 'https://twitter.com/statuses/' + t.id_str
+                                url: 'https://twitter.com/statuses/' + t.id_str,
+                                favorite: t.favorite_count
                             };
                             mediaURLs.push(tweet);
                         }
@@ -164,4 +166,5 @@ export interface Tweet {
     imageURL?: string;
     videoURL?: string;
     url: string;
+    favorite: number;
 }
