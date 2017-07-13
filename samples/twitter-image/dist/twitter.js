@@ -58,7 +58,7 @@ var Twitter = (function (_super) {
             qs: {
                 'q': keyword + " filter:images min_retweets:1 exclude:retweets",
                 'lang': 'ja',
-                'count': 20,
+                'count': 100,
                 'result_type': 'recent'
             },
             headers: {
@@ -82,7 +82,7 @@ var Twitter = (function (_super) {
                                 if (url) {
                                     var tweet = {
                                         imageURL: url,
-                                        url: 'https://twitter.com/statuses/' + t.id_str,
+                                        url: "https://twitter.com/" + t.user.screen_name + "/statuses/" + t.id_str,
                                         favorite: t.favorite_count
                                     };
                                     mediaURLs_1.push(tweet);
@@ -117,7 +117,7 @@ var Twitter = (function (_super) {
             qs: {
                 'q': keyword + " filter:videos min_retweets:1 exclude:retweets",
                 'lang': 'ja',
-                'count': 20,
+                'count': 100,
                 'result_type': 'recent'
             },
             headers: {
@@ -156,7 +156,7 @@ var Twitter = (function (_super) {
                             var tweet = {
                                 videoURL: url,
                                 imageURL: thumbnail_url,
-                                url: 'https://twitter.com/statuses/' + t.id_str,
+                                url: "https://twitter.com/" + t.user.screen_name + "/statuses/" + t.id_str,
                                 favorite: t.favorite_count
                             };
                             mediaURLs_2.push(tweet);
